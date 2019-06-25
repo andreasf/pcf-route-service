@@ -1,7 +1,6 @@
 package io.pivotalservices.tokenservice;
 
 
-import org.aspectj.util.FileUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,12 +31,16 @@ public class TestJwkEndpoint {
     @Autowired
     private MockMvc mockMvc;
 
+    private static String resourceAsString(String filename) throws IOException, URISyntaxException {
+        URI resourceUri = XAuthUserTokenBuilder.class.getClassLoader().getResource(filename).toURI();
+        Path path = Paths.get(resourceUri);
+        return new String(Files.readAllBytes(path));
+    }
+
     @Test
     public void getCategoriesTest_delegatesToRepositories() throws Exception {
         // Arrange
-        String jksFile = FileUtil.readAsString(
-                new File(XAuthUserTokenBuilder.class.getClassLoader().getResource(fileName).getFile())
-        );
+        String jksFile = resourceAsString(fileName);
 
         // Act (and Assert)
         mockMvc.perform(get("/jwk"))

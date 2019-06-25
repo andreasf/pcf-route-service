@@ -1,18 +1,9 @@
-buildscript {
-	ext {
-		springBootVersion = '1.4.2.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
+plugins {
+	id 'org.springframework.boot' version '2.1.5.RELEASE'
+	id 'java'
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 jar {
 	baseName = 'pcf-route-service'
@@ -29,7 +20,7 @@ repositories {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.cloud:spring-cloud-starter-sleuth')
+	//compile('org.springframework.cloud:spring-cloud-starter-sleuth')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('com.nimbusds:nimbus-jose-jwt:5.4')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -37,8 +28,8 @@ dependencies {
 //	compile('org.springframework.cloud:spring-cloud-sleuth-zipkin-stream')
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR3"
-	}
-}
+//dependencyManagement {
+//	imports {
+//		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR3"
+//	}
+//}

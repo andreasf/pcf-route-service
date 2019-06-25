@@ -10,14 +10,17 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -37,10 +40,16 @@ public class XAuthUserTokenBuilder {
     public static final String EDO_KLID = "EDO_KLID";
     public static final String EDO_USER_ID = "EDO_USER_ID";
     public static final String EXPIRY_DATE = "EXPIRY_DATE";
-    protected static final String DEFAULT_PRIVATE_KEY = "f66e26b3-fbd0-4c0e-8113-d0c7f913978c";
+    protected static final String DEFAULT_PRIVATE_KEY = "rcc-edge-router-v1";
 
     public static String generateSignedToken(Map<String, Object> data) {
         return generateSignedToken(data, DEFAULT_PRIVATE_KEY, JWS_ALGORITHM);
+    }
+
+    private static String resourceAsString(String filename) throws IOException, URISyntaxException {
+        URI resourceUri = XAuthUserTokenBuilder.class.getClassLoader().getResource(filename).toURI();
+        Path path = Paths.get(resourceUri);
+        return new String(Files.readAllBytes(path));
     }
 
     private static String generateSignedToken(Map<String, Object> data, String keyId, JWSAlgorithm algorithm) {
@@ -49,9 +58,10 @@ public class XAuthUserTokenBuilder {
 
         try {
             final byte[] keyBytes = Base64.getDecoder().decode(
-                    FileUtil.readAsString(
-                            new File(XAuthUserTokenBuilder.class.getClassLoader().getResource("jwk-private-key").getFile())
-                    )
+                    resourceAsString("jwk-private-key")
+//                    FileUtil.readAsString(
+//                            new File(XAuthUserTokenBuilder.class.getClassLoader().getResource("jwk-private-key").getFile())
+//                    )
             );
 
             PKCS8EncodedKeySpec spec =
